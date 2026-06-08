@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Répartition budgétaire — Soliguide Occitanie</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F3EE;
+    --surface: #FFFFFF;
+    --surface2: #EEEBe4;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.14);
+    --text: #1A1916;
+    --text-muted: #6B6860;
+    --text-faint: #9E9B92;
+    --accent: #1A6B4A;
+    --accent-light: #E1F0EA;
+    --accent-text: #0F4A32;
+    --warn: #8B3A10;
+    --warn-light: #FAEAE0;
+    --info: #1A4A8B;
+    --info-light: #E0EAFA;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  header {
+    max-width: 900px;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border2);
+    padding-bottom: 1.25rem;
+  }
+
+  .logo-area h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .logo-area p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .pill {
+    background: var(--accent-light);
+    color: var(--accent-text);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .main { max-width: 900px; margin: 0 auto; }
+
+  /* Controls panel */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 1rem;
+  }
+
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .controls-grid3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .ctrl-block label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ctrl-row input[type=range] {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .ctrl-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .ctrl-row input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .ctrl-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 38px;
+    color: var(--accent);
+    text-align: right;
+  }
+  .weight-total {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-top: 6px;
+    text-align: center;
+  }
+  .weight-total.ok { color: var(--accent); }
+  .weight-total.err { color: #C0392B; }
+
+  .money-input-wrap {
+    position: relative;
+  }
+  .money-input-wrap span {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+  .money-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 9px 32px 9px 12px;
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .money-input:focus { border-color: var(--accent); }
+
+  /* Summary bar */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .summary-cell {
+    background: var(--surface);
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+  .summary-cell .s-label {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .summary-cell .s-val {
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .summary-cell .s-val.ok { color: var(--accent); }
+  .summary-cell .s-val.err { color: #C0392B; }
+  .summary-cell .s-val.warn { color: var(--warn); }
+
+  /* Table */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-faint);
+    text-align: left;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  thead th:last-child { text-align: right; }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+  tbody td {
+    padding: 13px 14px;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .dept-name { font-weight: 500; font-size: 14px; }
+  .mono { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+  .bar-wrap { width: 80px; background: var(--surface2); border-radius: 3px; height: 5px; }
+  .bar-fill { height: 5px; border-radius: 3px; background: var(--accent); transition: width 0.4s ease; }
+  .budget-cell { text-align: right; }
+  .budget-main { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; }
+  .budget-pct { font-size: 11px; color: var(--text-faint); margin-top: 1px; }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .tag-min { background: var(--info-light); color: var(--info); }
+  .tag-max { background: var(--warn-light); color: var(--warn); }
+  .tag-ok { background: var(--accent-light); color: var(--accent-text); }
+
+  /* Data editor */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table thead th {
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-faint);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table tbody tr { border-bottom: 1px solid var(--border); }
+  .data-table tbody tr:last-child { border-bottom: none; }
+  .data-table tbody td { padding: 6px 10px; font-size: 13px; vertical-align: middle; }
+  .data-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .data-input:focus { border-color: var(--accent); background: var(--surface); }
+  .data-input:hover:not(:focus) { border-color: var(--border2); }
+  .dept-input { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; }
+  .reset-btn {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+  }
+  .reset-btn:hover { color: var(--warn); background: var(--warn-light); }
+  .add-row-btn {
+    margin-top: 10px;
+    background: none;
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 7px 14px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .add-row-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Export */
+  .export-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+  .btn {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 8px 16px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn:hover { background: var(--surface2); border-color: var(--border2); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent-text); border-color: var(--accent-text); }
+
+  .note {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-top: 1.25rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 1rem; }
+    .controls-grid, .controls-grid3 { grid-template-columns: 1fr; }
+    .summary-bar { grid-template-columns: 1fr 1fr; }
+    header { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .bar-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <h1>Répartition budgétaire — Soliguide Occitanie</h1>
+    <p>Outil de simulation pour la stratégie de levée de fonds 2027</p>
+  </div>
+  <span class="pill" id="headerBudget">183 500 €</span>
+</header>
+
+<div class="main">
+
+  <!-- Pondérations -->
+  <div class="panel">
+    <div class="panel-title">Pondération des critères</div>
+    <div class="controls-grid">
+      <div class="ctrl-block">
+        <label>Population du département</label>
+        <div class="ctrl-row">
+          <input type="range" id="wPop" min="0" max="100" step="5" value="50">
+          <span class="ctrl-val" id="wPopVal">50%</span>
+        </div>
+      </div>
+      <div class="ctrl-block">
+        <label>Nombre de fiches Soliguide</label>
+        <div class="ctrl-row">
+          <input type="range" id="wFiche" min="0" max="100" step="5" value="50">
+          <span class="ctrl-val" id="wFicheVal">50%</span>
+        </div>
+        <div class="weight-total ok" id="weightCheck">= 100% ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budgets min/max/total -->
+  <div class="panel">
+    <div class="panel-title">Paramètres budgétaires</div>
+    <div class="controls-grid3">
+      <div class="ctrl-block">
+        <label>Budget total</label>
+        <div class="money-input-wrap">
+          <input class="money-input" type="number" id="budgetTotal" value="183500" step="500" min="0">
+          <span>€</span>
+        </div>
+      </div>
+      <div class="ctrl-block">
+        <label>Minimum par département</label>
+        <div class="money-input-wrap">
+          <input class="money-input" type="number" id="budgetMin" value="8000" step="500" min="0">
+          <span>€</span>
+        </div>
+      </div>
+      <div class="ctrl-block">
+        <label>Maximum par département</label>
+        <div class="money-input-wrap">
+          <input class="money-input" type="number" id="budgetMax" value="50000" step="500" min="0">
+          <span>€</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Données départements -->
+  <div class="panel">
+    <div class="panel-title">Données par département</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:36%">Département</th>
+          <th style="width:28%">Population</th>
+          <th style="width:28%">Fiches Soliguide</th>
+          <th style="width:8%"></th>
+        </tr>
+      </thead>
+      <tbody id="dataBody"></tbody>
+    </table>
+    <button class="add-row-btn" onclick="addRow()">+ Ajouter un département</button>
+  </div>
+
+  <!-- Résumé -->
+  <div class="summary-bar">
+    <div class="summary-cell">
+      <div class="s-label">Budget total</div>
+      <div class="s-val" id="sumTotal">—</div>
+    </div>
+    <div class="summary-cell">
+      <div class="s-label">Alloué</div>
+      <div class="s-val ok" id="sumAlloue">—</div>
+    </div>
+    <div class="summary-cell">
+      <div class="s-label">Restant</div>
+      <div class="s-val" id="sumRestant">—</div>
+    </div>
+    <div class="summary-cell">
+      <div class="s-label">Départements</div>
+      <div class="s-val" id="sumDepts">8</div>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Département</th>
+          <th>Population</th>
+          <th>Fiches</th>
+          <th>Score</th>
+          <th>Part</th>
+          <th style="text-align:right">Budget alloué</th>
+          <th style="text-align:right">Statut</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="export-row">
+    <button class="btn" onclick="exportCSV()">↓ Exporter CSV</button>
+    <button class="btn btn-primary" onclick="window.print()">Imprimer</button>
+  </div>
+
+  <p class="note">
+    Score composite = (poids pop × pop/pop_max) + (poids fiches × fiches/fiches_max) — chaque critère normalisé entre 0 et 1.<br>
+    Les budgets min/max sont appliqués avec redistribution itérative du surplus vers les départements libres. Arrondi à la centaine la plus proche.
+  </p>
+
+</div>
+
+<script>
+const defaultDepts = [
+  { name: "Haute-Garonne",       pop: 1498003, fiches: 965  },
+  { name: "Hérault",             pop: 1200000, fiches: 1403 },
+  { name: "Gard",                pop: 769000,  fiches: 518  },
+  { name: "Pyrénées-Orientales", pop: 500000,  fiches: 355  },
+  { name: "Tarn-et-Garonne",     pop: 265000,  fiches: 317  },
+  { name: "Lot",                 pop: 176000,  fiches: 235  },
+  { name: "Ariège",              pop: 155000,  fiches: 356  },
+  { name: "Lozère",              pop: 76000,   fiches: 125  }
+];
+
+let lastResult = [];
+
+function fmt(n) { return Math.round(n).toLocaleString('fr-FR'); }
+
+function getDepts() {
+  const rows = document.querySelectorAll('#dataBody tr');
+  return Array.from(rows).map(tr => ({
+    name:   tr.querySelector('.inp-name').value.trim() || '—',
+    pop:    parseFloat(tr.querySelector('.inp-pop').value)  || 0,
+    fiches: parseFloat(tr.querySelector('.inp-fiche').value) || 0
+  })).filter(d => d.pop > 0 || d.fiches > 0);
+}
+
+function renderDataRow(d, idx) {
+  const tr = document.createElement('tr');
+  tr.dataset.idx = idx;
+  tr.innerHTML = `
+    <td><input class="data-input dept-input inp-name" type="text" value="${d.name}" placeholder="Nom du département"></td>
+    <td><input class="data-input inp-pop" type="number" value="${d.pop}" min="0" step="1000" placeholder="0"></td>
+    <td><input class="data-input inp-fiche" type="number" value="${d.fiches}" min="0" step="1" placeholder="0"></td>
+    <td><button class="reset-btn" title="Supprimer" onclick="removeRow(this)">×</button></td>
+  `;
+  tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', compute));
+  return tr;
+}
+
+function buildDataTable() {
+  const tbody = document.getElementById('dataBody');
+  tbody.innerHTML = '';
+  defaultDepts.forEach((d, i) => tbody.appendChild(renderDataRow(d, i)));
+}
+
+function addRow() {
+  const tbody = document.getElementById('dataBody');
+  const newRow = renderDataRow({ name: '', pop: 0, fiches: 0 }, Date.now());
+  tbody.appendChild(newRow);
+  newRow.querySelector('.inp-name').focus();
+}
+
+function removeRow(btn) {
+  btn.closest('tr').remove();
+  compute();
+}
+
+function compute() {
+  const depts = getDepts();
+  if (!depts.length) return;
+
+  const wPop   = parseInt(document.getElementById('wPop').value) / 100;
+  const wFiche = 1 - wPop;
+  const budgetTotal = parseFloat(document.getElementById('budgetTotal').value) || 183500;
+  const budgetMin   = parseFloat(document.getElementById('budgetMin').value) || 0;
+  const budgetMax   = parseFloat(document.getElementById('budgetMax').value) || Infinity;
+
+  document.getElementById('headerBudget').textContent = fmt(budgetTotal) + ' €';
+  document.getElementById('sumTotal').textContent = fmt(budgetTotal) + ' €';
+  document.getElementById('sumDepts').textContent = depts.length;
+
+  const maxPop   = Math.max(...depts.map(d => d.pop));
+  const maxFiche = Math.max(...depts.map(d => d.fiches));
+
+  let data = depts.map(d => ({
+    ...d,
+    score: wPop * (d.pop / (maxPop || 1)) + wFiche * (d.fiches / (maxFiche || 1))
+  }));
+
+  const totalScore = data.reduce((s, d) => s + d.score, 0);
+  data = data.map(d => ({ ...d, rawBudget: totalScore ? (d.score / totalScore) * budgetTotal : budgetTotal / depts.length }));
+
+  let result = data.map(d => ({ ...d, budget: Math.min(Math.max(d.rawBudget, budgetMin), budgetMax) }));
+
+  for (let pass = 0; pass < 15; pass++) {
+    const pinnedSum = result.filter(d => d.budget <= budgetMin + 0.01 || d.budget >= budgetMax - 0.01).reduce((s, d) => s + d.budget, 0);
+    const free = result.filter(d => d.budget > budgetMin + 0.01 && d.budget < budgetMax - 0.01);
+    if (!free.length) break;
+    const freeScoreSum = free.reduce((s, d) => s + d.score, 0);
+    const pool = budgetTotal - pinnedSum;
+    let changed = false;
+    result = result.map(d => {
+      if (d.budget <= budgetMin + 0.01 || d.budget >= budgetMax - 0.01) return d;
+      const nb2 = Math.min(Math.max(freeScoreSum ? (d.score / freeScoreSum) * pool : pool / free.length, budgetMin), budgetMax);
+      if (Math.abs(nb2 - d.budget) > 0.5) changed = true;
+      return { ...d, budget: nb2 };
+    });
+    if (!changed) break;
+  }
+
+  result = result.map(d => ({ ...d, budget: Math.round(d.budget / 100) * 100 }));
+  const sum0 = result.reduce((s, d) => s + d.budget, 0);
+  const diff = Math.round(budgetTotal) - sum0;
+  if (diff !== 0) {
+    const sorted = [...result].sort((a, b) => b.budget - a.budget);
+    sorted[0].budget += diff;
+  }
+
+  result.sort((a, b) => b.budget - a.budget);
+  lastResult = result;
+
+  const totalAlloue = result.reduce((s, d) => s + d.budget, 0);
+  const restant = Math.round(budgetTotal) - totalAlloue;
+  const maxBudget = Math.max(...result.map(d => d.budget));
+
+  document.getElementById('sumAlloue').textContent = fmt(totalAlloue) + ' €';
+  document.getElementById('sumAlloue').className = 's-val ' + (Math.abs(restant) < 200 ? 'ok' : 'err');
+  document.getElementById('sumRestant').textContent = (restant >= 0 ? '+' : '') + fmt(restant) + ' €';
+  document.getElementById('sumRestant').className = 's-val ' + (Math.abs(restant) < 200 ? 'ok' : 'err');
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  result.forEach(d => {
+    const pct  = (d.budget / budgetTotal * 100).toFixed(1);
+    const barW = (d.budget / maxBudget * 100).toFixed(1);
+    const isMin = d.budget <= budgetMin + 50;
+    const isMax = d.budget >= budgetMax - 50;
+    const tag = isMin
+      ? '<span class="tag tag-min">minimum</span>'
+      : isMax
+      ? '<span class="tag tag-max">maximum</span>'
+      : '<span class="tag tag-ok">libre</span>';
+    tbody.innerHTML += `<tr>
+      <td class="dept-name">${d.name}</td>
+      <td class="mono">${(d.pop / 1000).toFixed(0)} k</td>
+      <td class="mono">${d.fiches}</td>
+      <td class="mono">${(d.score * 100).toFixed(1)}</td>
+      <td><div class="bar-wrap"><div class="bar-fill" style="width:${barW}%"></div></div></td>
+      <td class="budget-cell">
+        <div class="budget-main">${fmt(d.budget)} €</div>
+        <div class="budget-pct">${pct}%</div>
+      </td>
+      <td style="text-align:right">${tag}</td>
+    </tr>`;
+  });
+}
+
+function exportCSV() {
+  const budgetTotal = parseFloat(document.getElementById('budgetTotal').value) || 183500;
+  const wPop = document.getElementById('wPop').value;
+  const lines = [
+    'Département;Population;Fiches Soliguide;Score (×100);Budget alloué (€);Part (%)',
+    ...lastResult.map(d => {
+      const pct = (d.budget / budgetTotal * 100).toFixed(1);
+      return `${d.name};${d.pop};${d.fiches};${(d.score * 100).toFixed(2)};${d.budget};${pct}`;
+    }),
+    ``,
+    `TOTAL;;;${lastResult.reduce((s,d)=>s+d.budget,0)};100`
+  ];
+  const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `soliguide_budget_occitanie_pop${wPop}pct.csv`;
+  a.click();
+}
+
+document.getElementById('wPop').addEventListener('input', function() {
+  const v = parseInt(this.value);
+  document.getElementById('wPopVal').textContent = v + '%';
+  document.getElementById('wFicheVal').textContent = (100 - v) + '%';
+  document.getElementById('wFiche').value = 100 - v;
+  compute();
+});
+document.getElementById('wFiche').addEventListener('input', function() {
+  const v = parseInt(this.value);
+  document.getElementById('wFicheVal').textContent = v + '%';
+  document.getElementById('wPopVal').textContent = (100 - v) + '%';
+  document.getElementById('wPop').value = 100 - v;
+  compute();
+});
+['budgetTotal','budgetMin','budgetMax'].forEach(id =>
+  document.getElementById(id).addEventListener('input', compute)
+);
+
+buildDataTable();
+compute();
+</script>
+</body>
+</html>
